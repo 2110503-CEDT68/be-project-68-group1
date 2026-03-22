@@ -11,6 +11,10 @@ const RoomSchema = new mongoose.Schema({
         type: Number,
         required: [true, 'Please add an capacity']
     },
+    picture:{
+        type: String,
+        default: "https://drive.google.com/uc?export=view&id=1zjdthMTg9nYzgwpEkYwcyIPRC8eqC1L"
+    },
     address:{
         type: String,
         required: [true, 'Please add an address']
@@ -57,17 +61,5 @@ RoomSchema.virtual('reservation', {
     foreignField: 'room',
     justOne: false
 });
-
-RoomSchema.methods.timeAvailable = function(enteredTime) {
-    const [openHour, openMinute] = this.openTime.split(":").map(Number);
-    const open = openHour * 60 + openMinute;
-
-    const [closeHour, closeMinute] = this.closeTime.split(":").map(Number);
-    const close = closeHour * 60 + closeMinute;
-
-    const enteredMinutes = enteredTime.getHours() * 60 + enteredTime.getMinutes();
-
-    return enteredMinutes >= open && enteredMinutes <= close;
-}
 
 module.exports = mongoose.model('Room',RoomSchema);

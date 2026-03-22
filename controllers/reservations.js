@@ -4,10 +4,12 @@ const Room = require('../models/Room');
 exports.getReservations = async (req,res,next) => {
     let query;
 
+    console.log(req.user);
+
     if(req.user.role !== 'admin'){
         query = Reservation.find({user: req.user.id}).populate({
             path: 'room',
-            select: 'name province tel'
+            select: 'name province tel picture'
         });
     } else {
         if(req.params.roomId){
@@ -15,13 +17,13 @@ exports.getReservations = async (req,res,next) => {
 
             query = Reservation.find({room: req.params.roomId}).populate({
             path: 'room',
-            select: 'name province tel'
+            select: 'name province tel picture'
             });
         }
         else{
             query = Reservation.find().populate({
             path: 'room',
-            select: 'name province tel'
+            select: 'name province tel picture'
             });
         }
     }
@@ -47,7 +49,7 @@ exports.getReservation = async (req,res,next) => {
     try{
         const reservations = await Reservation.findById(req.params.id).populate({
             path: 'room',
-            select: 'name description tel'
+            select: 'name description tel picture'
         });
 
         if(!reservations){
@@ -87,10 +89,6 @@ exports.addReservation = async (req,res,next) => {
 
         if(existedReservations.length >= 3 && req.user.role !== 'admin'){
             return res.status(400).json({success:false, message: `The user with the ID of ${req.params.roomId} has already made 3 Reservations`});
-        }
-
-        if(!room.timeAvailable(new Date(req.body.resDate))){
-            return res.status(400).json({success:false, message: `Room is not available at that time`});
         }
 
         const reservation = await Reservation.create(req.body);
